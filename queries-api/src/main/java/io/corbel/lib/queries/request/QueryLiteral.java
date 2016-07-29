@@ -26,7 +26,6 @@ public abstract class QueryLiteral<T> {
     }
 
     public boolean operate(QueryOperator operator, Object object, QueryMatcher queryMatcher) throws QueryMatchingException {
-
         try {
             switch (operator) {
                 case $ALL:
@@ -53,6 +52,8 @@ public abstract class QueryLiteral<T> {
                     return this.ne(object);
                 case $SIZE:
                     return this.size(object);
+                case $NEAR:
+                    return this.near(object);
                 default:
                     return false;
             }
@@ -109,8 +110,12 @@ public abstract class QueryLiteral<T> {
         throw new QueryMatchingException(getExceptionMessage(QueryOperator.$SIZE));
     }
 
+    protected boolean near(Object object) throws QueryMatchingException {
+        throw new QueryMatchingException(getExceptionMessage(QueryOperator.$NEAR));
+    }
+
     private String getExceptionMessage(QueryOperator queryOperator) throws QueryMatchingException {
-        return "Operator " + queryOperator.name() + " not suported for matching with literal " + literal.getClass().getName();
+        return "Operator " + queryOperator.name() + " not supported for matching with literal " + literal.getClass().getName();
     }
 
 }

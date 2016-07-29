@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import io.corbel.lib.queries.validator.QueryLiteralValidator;
 import org.joda.time.format.ISODateTimeFormat;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -90,20 +91,25 @@ public class JacksonQueryParser implements QueryParser {
     private QueryLiteral<?> generateQueryLiteral(JsonNode nodeField, QueryOperator operator) throws MalformedJsonQueryException {
 
         if (nodeField.isObject()) {
-            throw new MalformedJsonQueryException("Unsupported operation. No operator supports Object type");
+            if (!operator.isObjectOperator()) {
+                throw new MalformedJsonQueryException(
+                        "Unsupported operation. Only $NEAR support operations with objects.");
+            }
+            QueryLiteralValidator.validate(nodeField, operator);
+            return generateObjectQueryLiteral(nodeField);
         } else if (nodeField.isArray()) {
             if (!operator.isArrayOperator()) {
                 throw new MalformedJsonQueryException(
-                        "Unsupported operation. Only $ALL, $IN, $NIN and $ELEM_MATCH support operations with non primitive types.");
+                        "Unsupported operation. Only $ALL, $IN, $NIN and $ELEM_MATCH support operations with arrays.");
             }
             if (operator == QueryOperator.$ELEM_MATCH) {
                 return generateResourceQueryQueryLiteral(nodeField);
             } else {
                 return generateArrayQueryLiteral(nodeField);
             }
-        } else if (operator.isArrayOperator()) {
+        } else if (operator.isArrayOperator() || operator.isObjectOperator()) {
             throw new MalformedJsonQueryException(
-                    "Unsopported operation. Only $EQ, $GT, $GTE, $LT, $LTE, $NE, $SIZE and $LIKE support operations with primitives.");
+                    "Unsupported operation. Only $EQ, $GT, $GTE, $LT, $LTE, $NE, $SIZE and $LIKE support operations with primitives.");
         }
         return generatePrimitiveQueryLiteral(nodeField);
     }
@@ -111,6 +117,13 @@ public class JacksonQueryParser implements QueryParser {
     private QueryLiteral<?> generateResourceQueryQueryLiteral(JsonNode nodeField) throws MalformedJsonQueryException {
         QueryLiteral<ResourceQuery> literal = new ResourceQueryQueryLiteral();
         literal.setLiteral(getParseQueriesFromTree(nodeField));
+        return literal;
+    }
+
+    @SuppressWarnings("rawtypes")
+    private QueryLiteral<?> generateObjectQueryLiteral(JsonNode nodeField) throws MalformedJsonQueryException {
+        QueryLiteral<JsonNode> literal = new ObjectQueryLiteral();
+        literal.setLiteral(nodeField);
         return literal;
     }
 
@@ -127,9 +140,7 @@ public class JacksonQueryParser implements QueryParser {
 
     @SuppressWarnings("unchecked")
     private QueryLiteral<?> generatePrimitiveQueryLiteral(JsonNode nodeField) throws MalformedJsonQueryException {
-
         QueryLiteral<?> literal;
-
         if (nodeField.isDouble()) {
             literal = new DoubleQueryLiteral();
             ((QueryLiteral<Double>) literal).setLiteral(nodeField.asDouble());

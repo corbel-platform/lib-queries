@@ -1,23 +1,24 @@
 package io.corbel.lib.queries.mongo.builder;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import io.corbel.lib.mongo.SafeKeys;
+import io.corbel.lib.queries.ListQueryLiteral;
+import io.corbel.lib.queries.ObjectQueryLiteral;
+import io.corbel.lib.queries.request.QueryLiteral;
+import io.corbel.lib.queries.request.QueryNode;
+import io.corbel.lib.queries.request.QueryOperator;
+import io.corbel.lib.queries.request.ResourceQuery;
+import org.springframework.data.geo.Point;
+import org.springframework.data.mongodb.core.query.Criteria;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import org.springframework.data.mongodb.core.query.Criteria;
-
-import io.corbel.lib.mongo.SafeKeys;
-import io.corbel.lib.queries.ListQueryLiteral;
-import io.corbel.lib.queries.request.QueryLiteral;
-import io.corbel.lib.queries.request.QueryNode;
-import io.corbel.lib.queries.request.QueryOperator;
-import io.corbel.lib.queries.request.ResourceQuery;
-
 /**
  * @author Rubén Carrasco
- *
  */
 public class CriteriaBuilder {
 
@@ -28,7 +29,7 @@ public class CriteriaBuilder {
     }
 
     public static Criteria buildFromResourceQueries(List<ResourceQuery> resourceQueries,
-            Function<QueryNode, QueryNode> queryNodeTransformer) {
+                                                    Function<QueryNode, QueryNode> queryNodeTransformer) {
         List<Criteria> criterias = new ArrayList<>();
         for (ResourceQuery resourceQuery : resourceQueries) {
             criterias.add(buildFromResourceQuery(resourceQuery, queryNodeTransformer));
@@ -48,7 +49,7 @@ public class CriteriaBuilder {
     }
 
     public static Criteria buildFromResourceQuery(ResourceQuery resourceQuery, Function<QueryNode, QueryNode> queryNodeTransformer) {
-        List<Criteria> criterias = new ArrayList<Criteria>();
+        List<Criteria> criterias = new ArrayList<>();
 
         for (QueryNode queryNode : resourceQuery) {
             String safeQuery = Arrays.stream(queryNode.getField().split("[.]")).map(SafeKeys::getSafeKey).collect(Collectors.joining("."));
@@ -95,8 +96,20 @@ public class CriteriaBuilder {
                 return criteria.exists((Boolean) value.getLiteral());
             case $SIZE:
                 return criteria.size(((Long) value.getLiteral()).intValue());
+            case $NEAR:
+                return fillCriteriaWithPositionObject(criteria, ((ObjectQueryLiteral) value).getLiteral());
+
         }
         return criteria;
+    }
+
+    private static Criteria fillCriteriaWithPositionObject(Criteria criteria, JsonNode position) {
+        if (position.has("maxDistance")) {
+            criteria.maxDistance(position.get("maxDistance").asDouble());
+        }
+        Point point = new Point(position.get("coordinates").get("x").asDouble(),
+                                position.get("coordinates").get("y").asDouble());
+        return criteria.near(point);
     }
 
 }
