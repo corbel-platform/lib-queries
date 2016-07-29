@@ -12,5 +12,5 @@ deploy:
     script: .travis/deploy.sh
     on:
       all_branches: true
-      repo: devialab/lib-queries
+      repo: corbel-platform/lib-queries
       jdk: oraclejdk8
