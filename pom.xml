@@ -30,9 +30,9 @@
     </modules>
 
     <scm>
-        <connection>scm:git:git://github.com/devialab/lib-queries.git</connection>
-        <developerConnection>scm:git:git@github.com/devialab/lib-queries.git</developerConnection>
-        <url>https://github.com/devialab/lib-queries</url>
+        <connection>scm:git:git://github.com/corbel-platform/lib-queries.git</connection>
+        <developerConnection>scm:git:git@github.com/corbel-platform/lib-queries.git</developerConnection>
+        <url>https://github.com/corbel-platform/lib-queries</url>
         <tag>HEAD</tag>
     </scm>
 
