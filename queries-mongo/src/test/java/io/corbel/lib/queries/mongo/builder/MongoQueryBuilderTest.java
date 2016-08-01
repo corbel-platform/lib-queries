@@ -154,7 +154,6 @@ public class MongoQueryBuilderTest {
         parser.parse(queryString);
     }
 
-
     @Test(expected = MalformedJsonQueryException.class)
     public void malformedElemMatchQueryTest() throws MalformedJsonQueryException {
         parser.parse("[{\"$elem_match\":{\"name\":\"Metallica\"}}]");

@@ -28,4 +28,14 @@ public class CustomJsonParser {
             throw new MalformedJsonQueryException("IOexception", e);
         }
     }
+
+    public <T>T readValueAsObject(JsonNode node, Class<T> clazz) throws MalformedJsonQueryException {
+        try {
+            return jsonFactory.createParser(node.toString()).readValueAs(clazz);
+        } catch (JsonProcessingException e) {
+            throw new MalformedJsonQueryException("Unexpected object for this operation", e);
+        } catch (IOException e) {
+            throw new MalformedJsonQueryException("IOexception", e);
+        }
+    }
 }

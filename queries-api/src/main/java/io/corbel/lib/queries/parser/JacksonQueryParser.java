@@ -11,7 +11,6 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import io.corbel.lib.queries.validator.QueryLiteralValidator;
 import org.joda.time.format.ISODateTimeFormat;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -95,7 +94,6 @@ public class JacksonQueryParser implements QueryParser {
                 throw new MalformedJsonQueryException(
                         "Unsupported operation. Only $NEAR support operations with objects.");
             }
-            QueryLiteralValidator.validate(nodeField, operator);
             return generateObjectQueryLiteral(nodeField);
         } else if (nodeField.isArray()) {
             if (!operator.isArrayOperator()) {
@@ -122,9 +120,7 @@ public class JacksonQueryParser implements QueryParser {
 
     @SuppressWarnings("rawtypes")
     private QueryLiteral<?> generateObjectQueryLiteral(JsonNode nodeField) throws MalformedJsonQueryException {
-        QueryLiteral<JsonNode> literal = new ObjectQueryLiteral();
-        literal.setLiteral(nodeField);
-        return literal;
+        return new PositionQueryLiteral(jsonParser, nodeField);
     }
 
     @SuppressWarnings("rawtypes")

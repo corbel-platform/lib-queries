@@ -1,9 +1,9 @@
 package io.corbel.lib.queries.mongo.builder;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import io.corbel.lib.mongo.SafeKeys;
 import io.corbel.lib.queries.ListQueryLiteral;
-import io.corbel.lib.queries.ObjectQueryLiteral;
+import io.corbel.lib.queries.PositionQueryLiteral;
+import io.corbel.lib.queries.model.Position;
 import io.corbel.lib.queries.request.QueryLiteral;
 import io.corbel.lib.queries.request.QueryNode;
 import io.corbel.lib.queries.request.QueryOperator;
@@ -97,19 +97,12 @@ public class CriteriaBuilder {
             case $SIZE:
                 return criteria.size(((Long) value.getLiteral()).intValue());
             case $NEAR:
-                return fillCriteriaWithPositionObject(criteria, ((ObjectQueryLiteral) value).getLiteral());
-
+                Position position = ((PositionQueryLiteral) value).getLiteral();
+                if (position.getMaxDistance() != null) {
+                    criteria.maxDistance(position.getMaxDistance());
+                }
+                return criteria.near(new Point(position.getCoordinates().getX(), position.getCoordinates().getY()));
         }
         return criteria;
     }
-
-    private static Criteria fillCriteriaWithPositionObject(Criteria criteria, JsonNode position) {
-        if (position.has("maxDistance")) {
-            criteria.maxDistance(position.get("maxDistance").asDouble());
-        }
-        Point point = new Point(position.get("coordinates").get("x").asDouble(),
-                                position.get("coordinates").get("y").asDouble());
-        return criteria.near(point);
-    }
-
 }
