@@ -1,12 +1,15 @@
 package io.corbel.lib.queries.mongo.builder;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import com.mongodb.BasicDBObject;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.springframework.data.geo.Point;
 import org.springframework.data.mongodb.core.query.Query;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -98,6 +101,57 @@ public class MongoQueryBuilderTest {
         Query query = new MongoQueryBuilder().query(resourceQuery).build();
         assertEquals("{\"track\":{\"$elemMatch\":{\"$and\":[{\"duration\":{\"$lte\":238.0}},{\"duration\":{\"$gte\":238.0}}]}}}",
                 query.getQueryObject().toString().replace(" ", ""));
+    }
+
+    @Test
+    public void nearQueryTest() throws MalformedJsonQueryException {
+        double x = 123, y = -456, maxDistance = 5000;
+        String field = "location";
+        String queryString = "[{\"$near\":{\"" + field + "\":{\"coordinates\": {\"x\":" + x +", \"y\":" + y + "}, \"maxDistance\": " + maxDistance + "}}}]";
+        ResourceQuery resourceQuery = parser.parse(queryString);
+        Query query = new MongoQueryBuilder().query(resourceQuery).build();
+        BasicDBObject queryObject = (BasicDBObject) query.getQueryObject().get(field);
+        assertEquals(maxDistance, (double) queryObject.get("$maxDistance"), 0);
+        Point point = (Point) queryObject.get("$near");
+        assertEquals(x, point.getX(), 0);
+        assertEquals(y, point.getY(), 0);
+    }
+
+    @Test
+    public void nearWithoutMaxDistanceQueryTest() throws MalformedJsonQueryException {
+        double x = 123, y = -456;
+        String field = "location";
+        String queryString = "[{\"$near\":{\"" + field + "\":{\"coordinates\": {\"x\":" + x +", \"y\":" + y + "}}}}]";
+        ResourceQuery resourceQuery = parser.parse(queryString);
+        Query query = new MongoQueryBuilder().query(resourceQuery).build();
+        BasicDBObject queryObject = (BasicDBObject) query.getQueryObject().get(field);
+        assertNull(queryObject.get("$maxDistance"));
+        Point point = (Point) queryObject.get("$near");
+        assertEquals(x, point.getX(), 0);
+        assertEquals(y, point.getY(), 0);
+    }
+
+    @Test(expected = MalformedJsonQueryException.class)
+    public void nearWithBadCoordinatesQueryTest() throws MalformedJsonQueryException {
+        double x = 123;
+        String field = "location";
+        String queryString = "[{\"$near\":{\"" + field + "\":{\"coordinates\": {\"x\":" + x +", \"y\":\"error\"}}}}]";
+        parser.parse(queryString);
+    }
+
+    @Test(expected = MalformedJsonQueryException.class)
+    public void nearWithoutCoordinatesQueryTest() throws MalformedJsonQueryException {
+        String field = "location";
+        String queryString = "[{\"$near\":{\"" + field + "\":{}}}}]";
+        parser.parse(queryString);
+    }
+
+    @Test(expected = MalformedJsonQueryException.class)
+    public void nearWithoutXCoordinateQueryTest() throws MalformedJsonQueryException {
+        double y = -456;
+        String field = "location";
+        String queryString = "[{\"$near\":{\"" + field + "\":{\"coordinates\": {\"y\":" + y + "}}}}]";
+        parser.parse(queryString);
     }
 
     @Test(expected = MalformedJsonQueryException.class)
