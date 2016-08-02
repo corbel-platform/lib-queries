@@ -1,7 +1,6 @@
 package io.corbel.lib.queries.model;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
@@ -10,30 +9,30 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  */
 public class Coordinates {
 
-    private double x;
-    private double y;
+    private double latitude;
+    private double longitude;
 
     @JsonCreator
-    public Coordinates(@JsonProperty(value = "x", required = true) Double x,
-                       @JsonProperty(value = "y", required = true) Double y) {
-        this.x = x;
-        this.y = y;
+    public Coordinates(@JsonProperty(value = "latitude", required = true) Double latitude,
+                       @JsonProperty(value = "longitude", required = true) Double longitude) {
+        this.latitude = latitude;
+        this.longitude = longitude;
     }
 
-    public double getX() {
-        return x;
+    public double getLatitude() {
+        return latitude;
     }
 
-    public void setX(double x) {
-        this.x = x;
+    public void setLatitude(double latitude) {
+        this.latitude = latitude;
     }
 
-    public double getY() {
-        return y;
+    public double getLongitude() {
+        return longitude;
     }
 
-    public void setY(double y) {
-        this.y = y;
+    public void setLongitude(double longitude) {
+        this.longitude = longitude;
     }
 
     @Override
@@ -43,8 +42,8 @@ public class Coordinates {
 
         Coordinates that = (Coordinates) o;
 
-        if (Double.compare(that.x, x) != 0) return false;
-        return Double.compare(that.y, y) == 0;
+        if (Double.compare(that.latitude, latitude) != 0) return false;
+        return Double.compare(that.longitude, longitude) == 0;
 
     }
 
@@ -52,15 +51,15 @@ public class Coordinates {
     public int hashCode() {
         int result;
         long temp;
-        temp = Double.doubleToLongBits(x);
+        temp = Double.doubleToLongBits(latitude);
         result = (int) (temp ^ (temp >>> 32));
-        temp = Double.doubleToLongBits(y);
+        temp = Double.doubleToLongBits(longitude);
         result = 31 * result + (int) (temp ^ (temp >>> 32));
         return result;
     }
 
     @Override
     public String toString() {
-        return "coordinates{" + "x: " + x + ", y: " + y + '}';
+        return "coordinates{" + "latitude: " + latitude + ", longitude: " + longitude + '}';
     }
 }

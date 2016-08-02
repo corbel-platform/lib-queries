@@ -101,7 +101,7 @@ public class CriteriaBuilder {
                 if (position.getMaxDistance() != null) {
                     criteria.maxDistance(position.getMaxDistance());
                 }
-                return criteria.near(new Point(position.getCoordinates().getX(), position.getCoordinates().getY()));
+                return criteria.near(new Point(position.getCoordinates().getLatitude(), position.getCoordinates().getLongitude()));
         }
         return criteria;
     }

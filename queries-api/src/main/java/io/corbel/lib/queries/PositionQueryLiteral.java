@@ -20,14 +20,14 @@ public class PositionQueryLiteral extends QueryLiteral<Position> {
     @Override
     protected boolean near(Object object) throws QueryMatchingException {
         Coordinates coordinates = (Coordinates) object;
-        return near(literal.getCoordinates().getX(), literal.getCoordinates().getY(),
-                    coordinates.getX(), coordinates.getY(), literal.getMaxDistance());
+        return near(literal.getCoordinates().getLatitude(), literal.getCoordinates().getLongitude(),
+                    coordinates.getLatitude(), coordinates.getLongitude(), literal.getMaxDistance());
     }
 
-    private boolean near(double x1, double y1, double x2, double y2, double maxDistance) {
-        double theta = y1 - y2;
-        double distance = Math.sin(deg2rad(x1)) * Math.sin(deg2rad(x2)) + Math.cos(deg2rad(x1)) *
-                      Math.cos(deg2rad(x2)) * Math.cos(deg2rad(theta));
+    private boolean near(double latitude1, double longitude1, double latitude2, double longitude2, double maxDistance) {
+        double theta = longitude1 - longitude2;
+        double distance = Math.sin(deg2rad(latitude1)) * Math.sin(deg2rad(latitude2)) + Math.cos(deg2rad(latitude1)) *
+                      Math.cos(deg2rad(latitude2)) * Math.cos(deg2rad(theta));
         //Convert distance to meters
         distance = Math.acos(distance);
         distance = rad2deg(distance);

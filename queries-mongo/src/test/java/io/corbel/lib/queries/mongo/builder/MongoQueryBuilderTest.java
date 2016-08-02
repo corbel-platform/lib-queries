@@ -107,7 +107,7 @@ public class MongoQueryBuilderTest {
     public void nearQueryTest() throws MalformedJsonQueryException {
         double x = 123, y = -456, maxDistance = 5000;
         String field = "location";
-        String queryString = "[{\"$near\":{\"" + field + "\":{\"coordinates\": {\"x\":" + x +", \"y\":" + y + "}, \"maxDistance\": " + maxDistance + "}}}]";
+        String queryString = "[{\"$near\":{\"" + field + "\":{\"coordinates\": {\"latitude\":" + x +", \"longitude\":" + y + "}, \"maxDistance\": " + maxDistance + "}}}]";
         ResourceQuery resourceQuery = parser.parse(queryString);
         Query query = new MongoQueryBuilder().query(resourceQuery).build();
         BasicDBObject queryObject = (BasicDBObject) query.getQueryObject().get(field);
@@ -121,7 +121,7 @@ public class MongoQueryBuilderTest {
     public void nearWithoutMaxDistanceQueryTest() throws MalformedJsonQueryException {
         double x = 123, y = -456;
         String field = "location";
-        String queryString = "[{\"$near\":{\"" + field + "\":{\"coordinates\": {\"x\":" + x +", \"y\":" + y + "}}}}]";
+        String queryString = "[{\"$near\":{\"" + field + "\":{\"coordinates\": {\"latitude\":" + x +", \"longitude\":" + y + "}}}}]";
         ResourceQuery resourceQuery = parser.parse(queryString);
         Query query = new MongoQueryBuilder().query(resourceQuery).build();
         BasicDBObject queryObject = (BasicDBObject) query.getQueryObject().get(field);
@@ -135,7 +135,7 @@ public class MongoQueryBuilderTest {
     public void nearWithBadCoordinatesQueryTest() throws MalformedJsonQueryException {
         double x = 123;
         String field = "location";
-        String queryString = "[{\"$near\":{\"" + field + "\":{\"coordinates\": {\"x\":" + x +", \"y\":\"error\"}}}}]";
+        String queryString = "[{\"$near\":{\"" + field + "\":{\"coordinates\": {\"latitude\":" + x +", \"longitude\":\"error\"}}}}]";
         parser.parse(queryString);
     }
 
@@ -150,7 +150,7 @@ public class MongoQueryBuilderTest {
     public void nearWithoutXCoordinateQueryTest() throws MalformedJsonQueryException {
         double y = -456;
         String field = "location";
-        String queryString = "[{\"$near\":{\"" + field + "\":{\"coordinates\": {\"y\":" + y + "}}}}]";
+        String queryString = "[{\"$near\":{\"" + field + "\":{\"coordinates\": {\"longitude\":" + y + "}}}}]";
         parser.parse(queryString);
     }
 

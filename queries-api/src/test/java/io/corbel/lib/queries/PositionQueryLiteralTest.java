@@ -13,7 +13,7 @@ public class PositionQueryLiteralTest {
 
     @Test
     public void toStringTest() {
-        assertThat(QUERY_LITERAL.toString()).isEqualTo("{coordinates{x: 45.6, y: 67.8}, maxDistance: 50.5}");
+        assertThat(QUERY_LITERAL.toString()).isEqualTo("{coordinates{latitude: 45.6, longitude: 67.8}, maxDistance: 50.5}");
     }
 
     @Test
