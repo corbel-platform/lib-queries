@@ -1,11 +1,8 @@
 package io.corbel.lib.queries;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import io.corbel.lib.queries.exception.MalformedJsonQueryException;
 import io.corbel.lib.queries.exception.QueryMatchingException;
 import io.corbel.lib.queries.model.Coordinates;
 import io.corbel.lib.queries.model.Position;
-import io.corbel.lib.queries.parser.CustomJsonParser;
 import io.corbel.lib.queries.request.QueryLiteral;
 
 /**
@@ -15,11 +12,6 @@ import io.corbel.lib.queries.request.QueryLiteral;
 public class PositionQueryLiteral extends QueryLiteral<Position> {
 
     public PositionQueryLiteral() { super(); }
-
-    public PositionQueryLiteral(CustomJsonParser customJsonParser, JsonNode objectNode)
-            throws MalformedJsonQueryException {
-        super(customJsonParser.readValueAsObject(objectNode, Position.class));
-    }
 
     public PositionQueryLiteral(Position position) {
         super(position);
