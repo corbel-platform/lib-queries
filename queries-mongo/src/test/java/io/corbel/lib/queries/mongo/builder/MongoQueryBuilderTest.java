@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.mongodb.BasicDBObject;
+import io.corbel.lib.queries.request.Sort;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.springframework.data.geo.Point;
@@ -189,4 +190,9 @@ public class MongoQueryBuilderTest {
         assertEquals("{}", query.getQueryObject().toString().replace(" ", ""));
     }
 
+    @Test
+    public void testSortByMultipleFields() {
+        Query query = new MongoQueryBuilder().sort(new Sort(Sort.Direction.ASC.name(), "field1, field2")).build();
+        assertEquals("{\"field1\":1,\"field2\":1}", query.getSortObject().toString().replace(" ", ""));
+    }
 }
