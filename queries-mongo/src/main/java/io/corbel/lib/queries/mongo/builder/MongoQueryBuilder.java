@@ -1,6 +1,8 @@
 package io.corbel.lib.queries.mongo.builder;
 
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -49,7 +51,7 @@ public class MongoQueryBuilder implements QueryBuilder {
     @Override
     public QueryBuilder sort(io.corbel.lib.queries.request.Sort sort) {
         if (sort != null) {
-            query.with(new Sort(Direction.fromString(sort.getDirection().name()), sort.getField()));
+            query.with(new Sort(Direction.fromString(sort.getDirection().name()), Arrays.asList(sort.getField().split(",")).stream().map(String::trim).collect(Collectors.toList())));
         }
         return this;
     }
